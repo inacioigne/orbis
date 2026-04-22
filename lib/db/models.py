@@ -67,7 +67,8 @@ class Publication(Base):
     contributors: Mapped[List["PublicationContributor"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
     fundings: Mapped[List["PublicationFunder"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
     keywords: Mapped[List["PublicationKeyword"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
-    metric_snapshots: Mapped[List["PublicationMetricSnapshot"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
+    metrics: Mapped[Optional["PublicationMetric"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
+    # metric_snapshots: Mapped[List["PublicationMetricSnapshot"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
     
     outgoing_references: Mapped[List["PublicationReference"]] = relationship(
         foreign_keys="PublicationReference.citing_publication_id",
@@ -152,9 +153,6 @@ class PublicationContainer(Base):
        
 class PublicationContributor(Base):
     __tablename__ = "publication_contributors"
-    # __table_args__ = (
-    #     UniqueConstraint("publication_id", "position", name="uq_publication_contributor_position"),
-    # )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     publication_id: Mapped[int] = mapped_column(ForeignKey("publications.id"), index=True)
@@ -184,6 +182,9 @@ class Author(Base):
     orcid: Mapped[Optional[str]] = mapped_column(String(50), unique=True, index=True)
     lattes_id: Mapped[Optional[str]] = mapped_column(String(50), unique=True, index=True)
     is_inpa_researcher: Mapped[Optional[bool]] = mapped_column(Boolean, index=True)
+    normalized_full_name: Mapped[Optional[str]] = mapped_column(String(255), index=True)
+    canonical_source: Mapped[Optional[str]] = mapped_column(String(50))
+    needs_review: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     
     affiliation_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("affiliations.id", ondelete="SET NULL"),
@@ -214,7 +215,7 @@ class Lattes(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     author_id: Mapped[int] = mapped_column(
-        ForeignKey("authors.id"),
+        ForeignKey("authors.id", ondelete="CASCADE"),
         unique=True,
         nullable=False,
         index=True
@@ -223,7 +224,7 @@ class Lattes(Base):
     lattes_id: Mapped[str] = mapped_column(String(20), unique=True, index=True)
     lattes_update: Mapped[datetime] = mapped_column(DateTime)
     html: Mapped[str] = mapped_column(LONGTEXT)
-    json: Mapped[dict] = mapped_column(JSON)
+    # json: Mapped[dict] = mapped_column(JSON)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -284,8 +285,8 @@ class PublicationKeyword(Base):
 
     publication: Mapped["Publication"] = relationship(back_populates="keywords")
     
-class PublicationMetricSnapshot(Base):
-    __tablename__ = "publication_metric_snapshots"
+class PublicationMetric(Base):
+    __tablename__ = "metrics"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     publication_id: Mapped[int] = mapped_column(ForeignKey("publications.id"), index=True)
@@ -304,8 +305,7 @@ class PublicationMetricSnapshot(Base):
 
     source: Mapped[Optional[str]] = mapped_column(String(50), index=True)
 
-    publication: Mapped["Publication"] = relationship(back_populates="metric_snapshots")
-    
+    publication: Mapped["Publication"] = relationship(back_populates="metrics")
     
 class PublicationContributorAffiliation(Base):
     __tablename__ = "publication_contributor_affiliations"

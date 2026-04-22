@@ -14,7 +14,7 @@ def _find_existing_author(session: Session, author_data: dict[str, Any]) -> Auth
     """
     orcid = author_data.get("orcid")
     lattes_id = author_data.get("lattes_id")
-    full_name = author_data.get("name")
+    full_name = author_data.get("full_name")
 
     if orcid:
         author = session.scalar(

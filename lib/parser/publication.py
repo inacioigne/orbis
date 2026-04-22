@@ -1,3 +1,5 @@
+from lib.helpers.abstract import normalize_abstract
+from lib.helpers.cleanText import clean_text
 from lib.helpers.firstStr import first_str
 from lib.helpers.normalizeDoi import normalize_doi
 from lib.parser.conditions_of_access import build_conditions_of_access, infer_free_access
@@ -9,12 +11,15 @@ from lib.parser.subject import parse_subject
 
 
 def parser_publication(data):
+    
+    title = clean_text(first_str(data.get("title")))
+    
     publication = {
         "publication_type": data.get("type"),
-        "title": first_str(data.get("title")),
+        "title": title,
         "subtitle": first_str(data.get("subtitle")),
         "alternative_title": first_str(data.get("short-title")) or first_str(data.get("original-title")),
-        "abstract": data.get("abstract"),
+        "abstract": normalize_abstract(data.get("abstract")),
         "date_published": parse_date(
                 data.get("published")
                 or data.get("published-print")
