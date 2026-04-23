@@ -16,8 +16,7 @@ def baixar_lattes(driver, lattes_id):
         window = driver.window_handles[-1]
         driver.switch_to.window(window)
         html = driver.page_source
-        # with open('data/cv.html', 'w') as f:
-        #     f.write(html)
+        
         driver.quit()
         return html
     

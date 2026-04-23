@@ -340,8 +340,6 @@ class Affiliation(Base):
     country: Mapped[Optional[str]] = mapped_column(String(100), index=True)
     state: Mapped[Optional[str]] = mapped_column(String(100))
     city: Mapped[Optional[str]] = mapped_column(String(100))
-    # ror: Mapped[Optional[str]] = mapped_column(String(100), unique=True, index=True)
-    # is_inpa: Mapped[Optional[bool]] = mapped_column(Boolean, index=True)
     
     authors: Mapped[List["Author"]] = relationship(
         "Author",

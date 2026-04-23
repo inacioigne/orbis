@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy.orm import Session
 
@@ -17,7 +18,7 @@ def update_lattes(session: Session, lattes: dict, author_db: Author) -> Lattes:
 def get_or_create_lattes(
     session: Session, 
     lattes: dict, 
-    author_db: Author,) -> Lattes:
+    author_db: Author,):
     
     lattes_id = lattes['lattes_id']
     lattes_update = datetime.strptime(lattes['lattes_update'], "%Y-%m-%d") 
@@ -26,7 +27,6 @@ def get_or_create_lattes(
         select(Lattes).where(Lattes.lattes_id == lattes_id)
     ).scalar_one_or_none()
     if existing:
-        
         if existing.lattes_update == lattes_update:
             print(f"Encontrado Lattes com o mesmo Lattes ID: {lattes_id}.")
             return existing
@@ -36,5 +36,6 @@ def get_or_create_lattes(
     lattes_db.author_id = author_db.id
     session.add(lattes_db)
     session.flush() 
+    
     return author_db
 
