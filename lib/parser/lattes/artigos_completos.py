@@ -10,6 +10,18 @@ def get_artigos_completos(soup):
     
     return list_artigos
 
+def get_autores(raw_artigo):
+    autores = []
+    for tag in raw_artigo.find_all(["a", "b"]):
+        name = tag.get_text(strip=True)
+        if "," in name and any(c.isupper() for c in name):
+            d_a = {'name': name}
+            href = tag.attrs.get('href')
+            if href:
+                id_lattes = href.split('/')[-1]
+                d_a['id_lattes'] = id_lattes
+            autores.append(d_a)
+    return autores
 
 def slipt_artigos(list_artigos):
     
@@ -21,7 +33,9 @@ def slipt_artigos(list_artigos):
         params = parse_qs(parsed.query, keep_blank_values=True)
         [doi] = params['doi'] 
         if doi == '':
-            params['raw_artigo'] = artigo
+            params['autores'] = get_autores(artigo)
+            params['date_published'] = artigo.find("span", {"data-tipo-ordenacao": "ano"}).get_text(strip=True)
+            # params['raw_artigo'] = artigo
             s_doi.append(params)
         else:
             c_doi.append(params)

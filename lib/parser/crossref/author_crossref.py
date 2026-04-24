@@ -3,7 +3,7 @@ from lib.helpers.clean import clean_text
 from lib.helpers.full_name import build_full_name
 from lib.helpers.norm_name_part import normalize_name_part
 from lib.helpers.orcid import extract_orcid_id
-from lib.parser.affiliation import get_affiliation
+from lib.parser.crossref.affiliation import get_affiliation
 
 
 def parser_author_crossref(author: dict):

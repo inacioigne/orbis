@@ -2,12 +2,12 @@ from lib.helpers.abstract import normalize_abstract
 from lib.helpers.cleanText import clean_text
 from lib.helpers.firstStr import first_str
 from lib.helpers.normalizeDoi import normalize_doi
-from lib.parser.conditions_of_access import build_conditions_of_access, infer_free_access
-from lib.parser.date import parse_date
-from lib.parser.deep_url import deep_get_url
-from lib.parser.license import first_license_url
-from lib.parser.page import parse_page_range
-from lib.parser.subject import parse_subject
+from lib.parser.crossref.conditions_of_access import build_conditions_of_access, infer_free_access
+from lib.parser.crossref.date import parse_date
+from lib.parser.crossref.deep_url import deep_get_url
+from lib.parser.crossref.license import first_license_url
+from lib.parser.crossref.page import parse_page_range
+from lib.parser.crossref.subject import parse_subject
 
 
 def parser_publication(data):

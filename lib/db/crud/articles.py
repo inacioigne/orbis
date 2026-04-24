@@ -1,13 +1,20 @@
 from lib.db.crud.authors.get_or_create import get_or_create_author
+from lib.db.crud.authors.vinculate_affiliation import affiliation_to_author
+from lib.db.crud.authors.vinculate_publication import authors_to_publication
 from lib.db.crud.container import get_or_create_container
+from lib.db.crud.funders.get_or_create import ingest_publication_funders
 from lib.db.crud.publication import get_or_create_publication
-from lib.parser.author_crossref import parser_author_crossref, parser_contributor
-from lib.parser.container import parser_container
-from lib.parser.funders import parse_funder
-from lib.parser.publication import parser_publication
+from lib.db.crud.references.replace_publication import replace_publication_references
+from lib.db.models import PublicationMetric
+from lib.parser.crossref.author_crossref import parser_author_crossref, parser_contributor
+from lib.parser.crossref.container import parser_container
+from lib.parser.crossref.funders import parse_funder
+from lib.parser.crossref.metrics import extract_metrics
+from lib.parser.crossref.publication import parser_publication
 
 from sqlalchemy.orm import Session, sessionmaker
 from lib.db.database import engine
+from lib.parser.crossref.references import parser_references
 
 SessionLocal = sessionmaker(
     bind=engine,
@@ -17,8 +24,8 @@ SessionLocal = sessionmaker(
 session = SessionLocal()
 
 
-def injest_article(article):
-    for artigo in article:
+def injest_article(articles):
+    for artigo in articles:
         publication = parser_publication(artigo)
         container = parser_container(artigo)
         funders = parse_funder(artigo)
@@ -44,12 +51,11 @@ def injest_article(article):
         # references
         references = parser_references(artigo)
         if references:
-            publication_db = replace_publication_references(session, publication_db, references)
+            replace_publication_references(session, publication_db, references)
         # metrics
         metrics = extract_metrics(artigo)
         metrics_db = PublicationMetric(**metrics)
         session.add(publication_db)
-        session.commit()
+        session.commit()        
         
-        
-        print("INJET --->>>>:",artigos.index(artigo))
+        print("INJET --->>>>:",articles.index(artigo))

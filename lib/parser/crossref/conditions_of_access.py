@@ -1,7 +1,7 @@
 from urllib.parse import urlparse
 
-from lib.parser.deep_get import deep_get
-from lib.parser.license import first_license_url
+from lib.parser.crossref.deep_get import deep_get
+from lib.parser.crossref.license import first_license_url
 
 OPEN_LICENSE_PATTERNS = [
     "creativecommons.org/licenses/",

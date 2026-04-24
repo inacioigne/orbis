@@ -5,27 +5,46 @@ from sqlalchemy import select
 
 from lib.db.models import Publication, PublicationContainer
 from lib.helpers.normalizeText import normalize_text
+from lib.helpers.similarity.main import check_similarity
 
 def get_or_create_publication(session: Session, publication: dict) -> Publication:
+    
     doi = publication.get("doi")
-    title = publication.get("title")
-
-    publi_doi = session.query(Publication).filter_by(doi=doi).first()
+    if doi:
+        publi_doi = session.query(Publication).filter_by(doi=doi).first()
+        if publi_doi:
+            print(f"DOI já existe: {doi}")
+            return publi_doi
+        
+    title = publication["title"]
     publi_title = session.query(Publication).filter_by(title=title).first()
-    if publi_doi:
-        print(f"Publicação já existe: {doi} - {title}")
-        return publi_doi
+    
     if publi_title:
-        print(f"Publicação já existe: {doi} - {title}")
+        print(f"Titulo já existe: {doi} - {title}")
         return publi_title
-    else:
-        print(f"Publicação nova: {doi} - {title}")
-        publication_db = Publication(**publication)
-        session.add(publication_db)
-        session.flush()  
-        session.commit()
+    
+    # --- 2. Checa similarity ---
+    candidates = session.scalars(select(Publication)).all()
+    for candidate in candidates:
+        res = check_similarity(candidate.title, title)
+        verdict = res.get("verdict")
+        if verdict == 'duplicate':
+            print("DUP: ", candidate.title)
+            return candidate
+        if verdict == 'review':
+            candidate.needs_review = True
+            session.add(candidate)
+            session.flush()
+        if verdict == 'distinct':
+            continue
+    
+    print(f"Publicação nova: {doi} - {title}")
+    publication_db = Publication(**publication)
+    session.add(publication_db)
+    session.flush()  
+    session.commit()
 
-        return publication_db
+    return publication_db
 
 def upsert_publication(
     session: Session,

@@ -1,6 +1,6 @@
 from lib.helpers.cleanText import clean_text
-from lib.parser.affiliation import get_affiliation
-from lib.parser.orcid import normalize_orcid
+from lib.parser.crossref.affiliation import get_affiliation
+from lib.parser.crossref.orcid import normalize_orcid
 
 def join_name(given, family):
     return " ".join([p for p in [given, family] if p]) or None

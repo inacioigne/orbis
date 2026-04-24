@@ -9,7 +9,7 @@ def replace_publication_references(
     session: Session,
     publication: Publication,
     references_data: list[dict[str, Any]],
-) -> None:
+) -> Publication:
     """
     Remove as referências atuais da publicação e recria a lista com base
     no JSON normalizado.

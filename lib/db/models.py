@@ -26,7 +26,6 @@ class Publication(Base):
 
     # Idioma e classificação
     language: Mapped[Optional[str]] = mapped_column(String(35), index=True)
-    # genre: Mapped[Optional[str]] = mapped_column(String(255), index=True)
     subject: Mapped[Optional[str]] = mapped_column(Text)
 
     # Identificadores
@@ -62,13 +61,13 @@ class Publication(Base):
 
     created_at = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    needs_review: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
 
     container: Mapped[Optional["PublicationContainer"]] = relationship(back_populates="publications")
     contributors: Mapped[List["PublicationContributor"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
     fundings: Mapped[List["PublicationFunder"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
     keywords: Mapped[List["PublicationKeyword"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
     metrics: Mapped[Optional["PublicationMetric"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
-    # metric_snapshots: Mapped[List["PublicationMetricSnapshot"]] = relationship(back_populates="publication", cascade="all, delete-orphan")
     
     outgoing_references: Mapped[List["PublicationReference"]] = relationship(
         foreign_keys="PublicationReference.citing_publication_id",
