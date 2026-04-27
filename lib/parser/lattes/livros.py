@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from groq import Groq
 from dotenv import load_dotenv
 
-from lib.helpers import normalize_autor
+from lib.helpers.normalize_autor import normalize_autor
 
 load_dotenv()
 
@@ -33,18 +33,20 @@ def parser_livros(livros):
     refs = []
     for livro in livros:
         d_l = {}
-        soup = BeautifulSoup(livro, 'html.parser')
-        doi = soup.find('a', class_='icone-doi')
+        # soup = BeautifulSoup(livro, 'html.parser')
+        doi = livro.find('a', class_='icone-doi')
         if doi:
             href = doi.attrs['href']
             d_l['doi'] = href
-        ref = soup.text
+        ref = livro.text
         norm_ref = normalize_ref(ref)
         autores = norm_ref.get('autores')
         n_autores = [normalize_autor(autor) for autor in autores]
         norm_ref['autores'] = n_autores
         d_l.update(norm_ref)
         refs.append(d_l)
+        
+    return refs
         
 def normalize_ref(referencia):
     client = Groq(api_key=api_key)

@@ -7,21 +7,21 @@ from lib.db.models import Publication, PublicationContainer
 from lib.helpers.normalizeText import normalize_text
 from lib.helpers.similarity.main import check_similarity
 
-def get_or_create_publication(session: Session, publication: dict) -> Publication:
+def get_or_create_publication(session: Session, publication: dict):
     
     doi = publication.get("doi")
     if doi:
         publi_doi = session.query(Publication).filter_by(doi=doi).first()
         if publi_doi:
             print(f"DOI já existe: {doi}")
-            return publi_doi
+            return publi_doi, False
         
     title = publication["title"]
     publi_title = session.query(Publication).filter_by(title=title).first()
     
     if publi_title:
         print(f"Titulo já existe: {doi} - {title}")
-        return publi_title
+        return publi_title, False
     
     # --- 2. Checa similarity ---
     candidates = session.scalars(select(Publication)).all()
@@ -30,7 +30,7 @@ def get_or_create_publication(session: Session, publication: dict) -> Publicatio
         verdict = res.get("verdict")
         if verdict == 'duplicate':
             print("DUP: ", candidate.title)
-            return candidate
+            return candidate, False
         if verdict == 'review':
             candidate.needs_review = True
             session.add(candidate)
@@ -44,7 +44,7 @@ def get_or_create_publication(session: Session, publication: dict) -> Publicatio
     session.flush()  
     session.commit()
 
-    return publication_db
+    return publication_db, True
 
 def upsert_publication(
     session: Session,
