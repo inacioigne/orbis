@@ -158,7 +158,7 @@ class PublicationContributor(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"), index=True)
 
     role: Mapped[Optional[str]] = mapped_column(String(50), index=True)  # author, editor, organizer, advisor
-    position: Mapped[Optional[str]] = mapped_column(String(50), index=True) 
+    # position: Mapped[Optional[str]] = mapped_column(String(50), index=True) 
 
     raw_name: Mapped[Optional[str]] = mapped_column(String(255))
     raw_affiliation: Mapped[Optional[str]] = mapped_column(Text)

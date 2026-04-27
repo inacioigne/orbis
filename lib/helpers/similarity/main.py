@@ -19,7 +19,7 @@ def check_similarity(name1: str, name2: str) -> dict:
     score += abbreviation_bonus(t1, t2)
     score = min(1.0, score)
 
-    if score >= 0.85:
+    if score >= 0.75:
         verdict = 'duplicate'
     elif score >= 0.65:
         verdict = 'review'
