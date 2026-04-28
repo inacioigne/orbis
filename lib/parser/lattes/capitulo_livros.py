@@ -1,3 +1,4 @@
+from datetime import date
 import os
 import json
 from groq import Groq
@@ -9,10 +10,10 @@ load_dotenv()
 
 api_key = os.getenv('GROQ_KEY')
 
-def parser_capitulos(livros):
+def parser_capitulos(capitulos):
     
     refs = []
-    for livro in livros:
+    for livro in capitulos:
         d_l = {}
         doi = livro.find('a', class_='icone-doi')
         if doi:
@@ -42,3 +43,18 @@ def normalize_ref(referencia):
         response_format={"type": "json_object"}
     )
     return json.loads(response.choices[0].message.content)
+
+def normalize_capitulo(capitulo):
+    publication = {
+        'publication_type': 'chapter-book',
+        'title': capitulo.get('titulo-do-capitulo'),
+        'date_published': date(int(capitulo.get('ano')), 1, 1),
+        'doi': capitulo.get('doi'),
+        'publisher': capitulo.get('editora'),
+        'volume_number': capitulo.get('volume'),
+        'page_start': capitulo.get('page_start'),
+        'page_end': capitulo.get('page_end'),
+        'edition': capitulo.get('edicao'),
+        'source': 'lattes'        
+    }
+    return publication
