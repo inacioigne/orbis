@@ -12,3 +12,7 @@ class ArticleOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ArticleCountOut(BaseModel):
+    total: int
